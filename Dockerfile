@@ -6,4 +6,4 @@ RUN mkdir /opt/bstore \
 WORKDIR /opt/bstore
 ADD . /opt/bstore
 EXPOSE 9090
-CMD ["/opt/bstore"]
+CMD ["/opt/bstore/bstore"]
