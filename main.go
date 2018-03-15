@@ -7,6 +7,7 @@ import (
     "net/http"
     "golang.org/x/crypto/bcrypt"
     "os"
+    "strconv"
 )
 
 type bpass struct {
@@ -32,8 +33,8 @@ func AppendRainbow(password, bpassword string){
     }
 }
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+func HashPassword(password string, bcost int) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcost)
 	return string(bytes), err
 }
 
@@ -44,7 +45,12 @@ func web(w http.ResponseWriter, r *http.Request) {
         t.Execute(w, nil)
     } else {
         r.ParseForm()
-        Bpass, err := HashPassword(r.Form["password"][0])
+        var bcost int
+        bcost, err := strconv.Atoi(r.Form["bcost"][0])
+        if err != nil {
+            bcost = 4
+        }
+        Bpass, err := HashPassword(r.Form["password"][0], bcost)
         if err != nil {
             fmt.Println(err)
         }
@@ -64,7 +70,12 @@ func safe(w http.ResponseWriter, r *http.Request) {
         t.Execute(w, nil)
     } else {
         r.ParseForm()
-        Bpass, err := HashPassword(r.Form["password"][0])
+        var bcost int
+        bcost, err := strconv.Atoi(r.Form["bcost"][0])
+        if err != nil {
+            bcost = 4
+        }
+        Bpass, err := HashPassword(r.Form["password"][0], bcost)
         if err != nil {
             fmt.Println(err)
         }
