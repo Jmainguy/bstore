@@ -44,8 +44,6 @@ func web(w http.ResponseWriter, r *http.Request) {
         t.Execute(w, nil)
     } else {
         r.ParseForm()
-        // logic part of log in
-        fmt.Println("password:", r.Form["password"])
         Bpass, err := HashPassword(r.Form["password"][0])
         if err != nil {
             fmt.Println(err)
@@ -60,8 +58,28 @@ func web(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+func safe(w http.ResponseWriter, r *http.Request) {
+    if r.Method == "GET" {
+        t, _ := template.ParseFiles("safe_get_hash.gtpl")
+        t.Execute(w, nil)
+    } else {
+        r.ParseForm()
+        Bpass, err := HashPassword(r.Form["password"][0])
+        if err != nil {
+            fmt.Println(err)
+        }
+        t, _ := template.ParseFiles("safe_post_hash.gtpl")
+        data := bpass{
+            Password: r.Form["password"][0],
+            Bpassword: Bpass,
+        }
+        t.Execute(w, data)
+    }
+}
+
 func main() {
     http.HandleFunc("/", web)
+    http.HandleFunc("/safe", safe)
     http.HandleFunc("/rainbow", func(w http.ResponseWriter, r *http.Request) {
         http.ServeFile(w, r, "./rainbow")
     })
